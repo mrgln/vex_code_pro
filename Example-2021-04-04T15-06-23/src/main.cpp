@@ -151,26 +151,30 @@ void usercontrol(void)
         right_intake.spin(forward);
         left_intake.spin(forward);
     }
-    // else if(Controller1.ButtonL2.pressing()){
-    //     FlyWheel.setVelocity(90, percent);        
-    //     FlyWheel.spin(reverse);         
-    // }
-    // else if(Controller1.ButtonR1.pressing()){
-    //     FlyWheel.setVelocity(100, percent);
-    //     krutilka2.setVelocity(100, percent);
-    //     right_intake.setVelocity(100, percent);
-    //     left_intake.setVelocity(100, percent);
-    //     FlyWheel.spin(forward);
-    //     krutilka2.spin(forward);
-    //     right_intake.spin(forward);
-    //     left_intake.spin(forward);    
-    // }
-    // else if(Controller1.ButtonR2.pressing()){
-    //     FlyWheel.setVelocity(100, percent);
-    //     krutilka2.setVelocity(100, percent);
-    //     FlyWheel.spin(reverse);
-    //     krutilka2.spin(reverse);
-    // }
+
+    else if(Controller1.ButtonL2.pressing()){
+        FlyWheel.setVelocity(90, percent);        
+        FlyWheel.spin(reverse);         
+    }
+
+    else if(Controller1.ButtonR1.pressing()){
+        FlyWheel.setVelocity(100, percent);
+        MiddleRollers.setVelocity(100, percent);
+        right_intake.setVelocity(100, percent);
+        left_intake.setVelocity(100, percent);
+        FlyWheel.spin(forward);
+        MiddleRollers.spin(forward);
+        right_intake.spin(forward);
+        left_intake.spin(forward);    
+    }
+
+    else if(Controller1.ButtonR2.pressing()){
+        FlyWheel.setVelocity(100, percent);
+        MiddleRollers.setVelocity(100, percent);
+        FlyWheel.spin(reverse);
+        MiddleRollers.spin(reverse);
+    }
+
     //Controller1.ButtonR2.pressed(gg);
     //Controller1.ButtonL2.pressed(gg);
     wait(20, msec); 
@@ -186,5 +190,4 @@ Competition.drivercontrol(usercontrol);
 pre_auton();
 
 while(true){wait(100,msec);}
-
 }
