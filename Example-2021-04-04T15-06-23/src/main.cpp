@@ -41,24 +41,53 @@ double kP = 0.0;
 double kI = 0.0;
 double kD = 0.0;
 
+double turnkP = 0.0;
+double turnkI = 0.0;
+double turnkD = 0.0;
+
 //Autonomous Settings
 int desiredValue = 200;
+int desiredTurnValue = 0;
 
 int error; //Current Value - Desired Value -> Positional Value (delta)
 int preError = 0; // Position 20 ms ago
 int derivative; // error - preError -> Speed
 int totalError=0; // totalError = totalError + error
 
+int turnError; //Current Value - Desired Value -> Positional Value (delta)
+int turnPreError = 0; // Position 20 ms ago
+int turnDerivative; // error - preError -> Speed
+int turnTotalError=0; // totalError = totalError + error
+
+bool resetDriveSensors = false;
 
 bool enableDrivePid = true;
+
 
 int drivePid()
 {
   while(enableDrivePid)
   {
+    if(resetDriveSensors)
+    {
+      resetDriveSensors = false;
+
+      LF.setPosition(0,degrees);
+      RF.setPosition(0,degrees);
+
+    }
+
+
     //Get position of motors 
     int leftMotorPosition = LF.position(degrees);
     int rightMotorPosition = RF.position(degrees);
+
+
+
+
+    /////////////////////////////////////////////////////
+    /// Lateral Movement PID
+    /////////////////////////////////////////////////////////////////////////
 
     int averagePosition = (leftMotorPosition + rightMotorPosition)/2;
 
@@ -73,7 +102,32 @@ int drivePid()
 
     double lateralMotorPower = (error * kP + derivative * kD + totalError * kI);
 
+
+
+
+
+
+    /////////////////////////////////////////////////////
+    /// Turning Movement PID
+    //////////////////////////////////////////////////////////////////////////
+    
+    int turnDifference = leftMotorPosition - rightMotorPosition;
+
+    //Potential
+    turnError = turnDifference - desiredTurnValue;
+
+    //Derivative
+    turnDerivative = turnError - turnPreError;
+
+    //Integral
+    turnTotalError += turnError;
+
+    double turnMotorPower = (turnError * turnkP + turnDerivative * turnkD + turnTotalError * turnkI);
+
+
+
     preError = error;
+    turnPreError = turnError;
     vex::task::sleep(20);
   }
 
@@ -87,6 +141,17 @@ void pre_auton(void){
 void autonomous(void)
 {
   vex::task skills(drivePid);
+
+  resetDriveSensors = true;
+  desiredValue = 300;
+  desiredTurnValue = 600;
+
+  vex::task::sleep(1000);
+
+  resetDriveSensors = true;
+  desiredValue = 300;
+  desiredTurnValue = 300;
+
 
   //setvelocity
   FlyWheel.setVelocity(100,percent);
@@ -141,20 +206,27 @@ void usercontrol(void)
 
     FlyWheel.stop();
     MiddleRollers.stop();
+    left_intake.stop(hold);
+    right_intake.stop(hold);
 
 
     if(Controller1.ButtonL1.pressing()){
         FlyWheel.setVelocity(100, percent);
-        right_intake.setVelocity(100, percent);
-        left_intake.setVelocity(100, percent);
+        MiddleRollers.setVelocity(100, percent);
         FlyWheel.spin(forward);
-        right_intake.spin(forward);
-        left_intake.spin(forward);
+        MiddleRollers.spin(forward);
+  
     }
 
     else if(Controller1.ButtonL2.pressing()){
-        FlyWheel.setVelocity(90, percent);        
-        FlyWheel.spin(reverse);         
+        FlyWheel.setVelocity(100, percent);     
+        right_intake.setVelocity(70, percent);
+        left_intake.setVelocity(70, percent);   
+        MiddleRollers.setVelocity(100, percent);
+        FlyWheel.spin(reverse);
+        MiddleRollers.spin(reverse);  
+        right_intake.spin(reverse);
+        left_intake.spin(reverse);     
     }
 
     else if(Controller1.ButtonR1.pressing()){
@@ -171,8 +243,12 @@ void usercontrol(void)
     else if(Controller1.ButtonR2.pressing()){
         FlyWheel.setVelocity(100, percent);
         MiddleRollers.setVelocity(100, percent);
+        right_intake.setVelocity(70, percent);
+        left_intake.setVelocity(70, percent);
         FlyWheel.spin(reverse);
         MiddleRollers.spin(reverse);
+        right_intake.spin(reverse);
+        left_intake.spin(reverse); 
     }
 
     //Controller1.ButtonR2.pressed(gg);
