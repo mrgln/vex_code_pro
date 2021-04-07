@@ -241,14 +241,16 @@ void usercontrol(void)
     }
 
     else if(Controller1.ButtonR2.pressing()){
+
         FlyWheel.setVelocity(100, percent);
         MiddleRollers.setVelocity(100, percent);
         right_intake.setVelocity(70, percent);
         left_intake.setVelocity(70, percent);
+
         FlyWheel.spin(reverse);
         MiddleRollers.spin(reverse);
-        right_intake.spin(reverse);
-        left_intake.spin(reverse); 
+        right_intake.spinFor(reverse,1,turns);
+        left_intake.spinFor(reverse,1,turns) ; 
     }
 
     //Controller1.ButtonR2.pressed(gg);
