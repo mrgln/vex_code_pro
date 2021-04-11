@@ -74,15 +74,12 @@ int drivePid()
 
       LF.setPosition(0,degrees);
       RF.setPosition(0,degrees);
-
+      GyroB.setHeading(0,degrees);
     }
-
 
     //Get position of motors 
     int leftMotorPosition = LF.position(degrees);
     int rightMotorPosition = RF.position(degrees);
-
-
 
 
     /////////////////////////////////////////////////////
@@ -103,8 +100,10 @@ int drivePid()
     double lateralMotorPower = (error * kP + derivative * kD + totalError * kI);
 
 
-
-
+    LF.spin(forward, lateralMotorPower, voltageUnits ::volt);
+    RF.spin(forward, lateralMotorPower, voltageUnits::volt);
+    RB.spin(forward, lateralMotorPower, voltageUnits ::volt);
+    LB.spin(forward, lateralMotorPower, voltageUnits ::volt);
 
 
     /////////////////////////////////////////////////////
@@ -140,29 +139,7 @@ void pre_auton(void){
 
 void autonomous(void)
 {
-  vex::task skills(drivePid);
-
-  resetDriveSensors = true;
-  desiredValue = 300;
-  desiredTurnValue = 600;
-
-  vex::task::sleep(1000);
-
-  resetDriveSensors = true;
-  desiredValue = 300;
-  desiredTurnValue = 300;
-
-
-  //setvelocity
-  FlyWheel.setVelocity(100,percent);
-  right_intake.setVelocity(100,percent);
-  left_intake.setVelocity(100,percent);
-  driveMotors.setVelocity(100,percent);
-
-  //programm
-  FlyWheel.spinFor(forward,360,degrees);
-  intakeMotors.spinFor(reverse,100,degrees);
-  driveMotors.spinFor(forward,360,degrees);
+  FlyWheel.spinFor(360, degrees);
 }
 
 //driving 
@@ -249,8 +226,8 @@ void usercontrol(void)
 
         FlyWheel.spin(reverse);
         MiddleRollers.spin(reverse);
-        right_intake.spinFor(reverse,1,turns);
-        left_intake.spinFor(reverse,1,turns) ; 
+        right_intake.spin(reverse);
+        left_intake.spin(reverse) ; 
     }
 
     //Controller1.ButtonR2.pressed(gg);
