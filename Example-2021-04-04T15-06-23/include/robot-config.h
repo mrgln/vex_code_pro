@@ -12,7 +12,6 @@ extern motor LB;
 extern motor MiddleRollers;
 extern motor left_intake;
 extern gyro GyroB;
-extern encoder EncoderG;
 extern controller Controller1;
 
 /**

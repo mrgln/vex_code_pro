@@ -17,7 +17,6 @@ motor LB = motor(PORT16, ratio18_1, false);
 motor MiddleRollers = motor(PORT18, ratio18_1, false);
 motor left_intake = motor(PORT21, ratio18_1, true);
 gyro GyroB = gyro(Brain.ThreeWirePort.B);
-encoder EncoderG = encoder(Brain.ThreeWirePort.G);
 controller Controller1 = controller(primary);
 
 // VEXcode generated functions

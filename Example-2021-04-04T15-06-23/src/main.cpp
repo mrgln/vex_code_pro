@@ -19,7 +19,6 @@
 // MiddleRollers        motor         18              
 // left_intake          motor         21              
 // GyroB                gyro          B               
-// EncoderG             encoder       G, H            
 // Controller1          controller                    
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
@@ -32,120 +31,83 @@ using namespace vex;
 
 competition Competition;
 
-motor_group driveMotors = motor_group(RF, RB, LF, LB);
-
-motor_group intakeMotors = motor_group(right_intake,left_intake);
-
-//settings
-double kP = 0.0;
-double kI = 0.0;
-double kD = 0.0;
-
-double turnkP = 0.0;
-double turnkI = 0.0;
-double turnkD = 0.0;
-
-//Autonomous Settings
-int desiredValue = 200;
-int desiredTurnValue = 0;
-
-int error; //Current Value - Desired Value -> Positional Value (delta)
-int preError = 0; // Position 20 ms ago
-int derivative; // error - preError -> Speed
-int totalError=0; // totalError = totalError + error
-
-int turnError; //Current Value - Desired Value -> Positional Value (delta)
-int turnPreError = 0; // Position 20 ms ago
-int turnDerivative; // error - preError -> Speed
-int turnTotalError=0; // totalError = totalError + error
-
-bool resetDriveSensors = false;
-
-bool enableDrivePid = true;
-
-
-int drivePid()
-{
-  while(enableDrivePid)
-  {
-    if(resetDriveSensors)
-    {
-      resetDriveSensors = false;
-
-      LF.setPosition(0,degrees);
-      RF.setPosition(0,degrees);
-      GyroB.setHeading(0,degrees);
-    }
-
-    //Get position of motors 
-    int leftMotorPosition = LF.position(degrees);
-    int rightMotorPosition = RF.position(degrees);
-
-
-    /////////////////////////////////////////////////////
-    /// Lateral Movement PID
-    /////////////////////////////////////////////////////////////////////////
-
-    int averagePosition = (leftMotorPosition + rightMotorPosition)/2;
-
-    //Potential
-    error = averagePosition - desiredValue;
-
-    //Derivative
-    derivative = error - preError;
-
-    //Integral
-    totalError += error;
-
-    double lateralMotorPower = (error * kP + derivative * kD + totalError * kI);
-
-
-    LF.spin(forward, lateralMotorPower, voltageUnits ::volt);
-    RF.spin(forward, lateralMotorPower, voltageUnits::volt);
-    RB.spin(forward, lateralMotorPower, voltageUnits ::volt);
-    LB.spin(forward, lateralMotorPower, voltageUnits ::volt);
-
-
-    /////////////////////////////////////////////////////
-    /// Turning Movement PID
-    //////////////////////////////////////////////////////////////////////////
-    
-    int turnDifference = leftMotorPosition - rightMotorPosition;
-
-    //Potential
-    turnError = turnDifference - desiredTurnValue;
-
-    //Derivative
-    turnDerivative = turnError - turnPreError;
-
-    //Integral
-    turnTotalError += turnError;
-
-    double turnMotorPower = (turnError * turnkP + turnDerivative * turnkD + turnTotalError * turnkI);
-
-
-
-    preError = error;
-    turnPreError = turnError;
-    vex::task::sleep(20);
-  }
-
-  return 1;
-}
-
 void pre_auton(void){
   vexcodeInit();
 }
 
+void drive_PID(float target, int dir) {
+
+  RB.resetRotation(); RF.resetRotation(); LB.resetRotation(); LF.resetRotation();
+
+  float curPosition = (RB.rotation(rotationUnits::deg) + LB.rotation(rotationUnits::deg) + RF.rotation(rotationUnits::deg) + LF.rotation(rotationUnits::deg)) / 4;
+
+  float error = target - curPosition;
+  float Kp = 0.3;
+  float Kd = 1;
+
+  float derivative = 0;
+  float lastError = error;
+  
+  if(dir == 1)
+  {
+    while(error > 0) {
+    curPosition = (RB.rotation(rotationUnits::deg) + LB.rotation(rotationUnits::deg) + RF.rotation(rotationUnits::deg) + LF.rotation(rotationUnits::deg)) / 4;
+    
+    error = target - curPosition;
+    derivative = error - lastError;
+
+    RB.setVelocity((error * Kp) + (derivative *Kd), rpm);
+    LB.setVelocity((error * Kp) + (derivative *Kd), rpm);
+    RF.setVelocity((error * Kp) + (derivative *Kd), rpm);
+    LF.setVelocity((error * Kp) + (derivative *Kd), rpm);
+
+    RB.spin(forward);
+    LB.spin(forward);
+    RF.spin(forward);
+    LF.spin(forward);
+
+    lastError = error;
+
+    vex::task::sleep(10);
+    }
+  }
+  else
+  {
+    while(error > 0) {
+    curPosition = (RB.rotation(rotationUnits::deg) + LB.rotation(rotationUnits::deg) + RF.rotation(rotationUnits::deg) + LF.rotation(rotationUnits::deg)) / 4;
+    
+    error = target - std::abs(curPosition);
+
+    RB.setVelocity((error * Kp), rpm);
+    LB.setVelocity((error * Kp), rpm);
+    RF.setVelocity((error * Kp), rpm);
+    LF.setVelocity((error * Kp), rpm);
+
+    RB.spin(reverse);
+    LB.spin(reverse);
+    RF.spin(reverse);
+    LF.spin(reverse);
+
+    lastError = error;
+
+    vex::task::sleep(10);
+    }
+  }
+
+  RB.stop();
+  LB.stop();
+  RF.stop();
+  LF.stop();
+}
+
 void autonomous(void)
 {
-  FlyWheel.spinFor(360, degrees);
+  drive_PID(1000,1);
 }
 
 //driving 
 void usercontrol(void)
 {
-  enableDrivePid = false;
   
   while (1) {
     
