@@ -5,7 +5,6 @@ extern brain Brain;
 // VEXcode devices
 extern motor LF;
 extern motor RF;
-extern motor right_intake;
 extern motor FlyWheel;
 extern motor RB;
 extern motor LB;
@@ -13,6 +12,8 @@ extern motor MiddleRollers;
 extern motor left_intake;
 extern gyro GyroB;
 extern controller Controller1;
+extern motor right_intake;
+extern distance DistanceSensor;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.

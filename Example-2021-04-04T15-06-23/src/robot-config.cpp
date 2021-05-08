@@ -10,7 +10,6 @@ brain  Brain;
 // VEXcode device constructors
 motor LF = motor(PORT3, ratio18_1, false);
 motor RF = motor(PORT5, ratio18_1, true);
-motor right_intake = motor(PORT6, ratio18_1, false);
 motor FlyWheel = motor(PORT7, ratio18_1, true);
 motor RB = motor(PORT15, ratio18_1, true);
 motor LB = motor(PORT16, ratio18_1, false);
@@ -18,6 +17,8 @@ motor MiddleRollers = motor(PORT18, ratio18_1, false);
 motor left_intake = motor(PORT21, ratio18_1, true);
 gyro GyroB = gyro(Brain.ThreeWirePort.B);
 controller Controller1 = controller(primary);
+motor right_intake = motor(PORT11, ratio18_1, false);
+distance DistanceSensor = distance(PORT6);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable
