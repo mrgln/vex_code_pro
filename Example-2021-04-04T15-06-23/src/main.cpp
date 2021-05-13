@@ -40,25 +40,25 @@ void drive_PID(float target, int dir) {
 
   RB.resetRotation(); RF.resetRotation(); LB.resetRotation(); LF.resetRotation();
 
-  float curPosition = (RB.rotation(rotationUnits::deg) + LB.rotation(rotationUnits::deg) + RF.rotation(rotationUnits::deg) + LF.rotation(rotationUnits::deg)) / 4;
+  int curPosition = (RB.rotation(rotationUnits::deg) + LB.rotation(rotationUnits::deg) + RF.rotation(rotationUnits::deg) + LF.rotation(rotationUnits::deg)) / 4;
 
-  float error = target - curPosition;
-  float Kp = 0.3;
-  float Kd = 0.05;
+  int error = target - curPosition;
+  float Kp = 0.5;
+  float Kd = 0.5;
 
-  float derivative = 0;
-  float lastError = error;
+  int derivative = 0;
+  int lastError = error;
   
   if(dir == 1)
   {
-    while(error > 0) {
+    while(error > 5) {
     curPosition = (RB.rotation(rotationUnits::deg) + LB.rotation(rotationUnits::deg) + RF.rotation(rotationUnits::deg) + LF.rotation(rotationUnits::deg)) / 4;
     
     error = target - curPosition;
     derivative = error - lastError;
 
     RB.setVelocity(((error * Kp) + (derivative *Kd)), rpm);
-    LB.setVelocity(((error * Kp) + (derivative *Kd)),rpm);
+    LB.setVelocity(((error * Kp) + (derivative *Kd)), rpm);
     RF.setVelocity(((error * Kp) + (derivative *Kd)), rpm);
     LF.setVelocity(((error * Kp) + (derivative *Kd)), rpm);
 
@@ -74,7 +74,7 @@ void drive_PID(float target, int dir) {
   }
   else
   {
-    while(error > 0) {
+    while(error > 5) {
     curPosition = (RB.rotation(rotationUnits::deg) + LB.rotation(rotationUnits::deg) + RF.rotation(rotationUnits::deg) + LF.rotation(rotationUnits::deg)) / 4;
     
     error = target - std::abs(curPosition);
@@ -116,7 +116,7 @@ void turn_PID(float target, int dir)
   
   if(dir==1)
   {
-    while(error>0){
+    while(error>5){
     curPosition = (RB.rotation(rotationUnits::deg) + RF.rotation(rotationUnits::deg))/2 - (LF.rotation(rotationUnits::deg)+LB.rotation(rotationUnits::deg))/2;
     error = target - curPosition;
     derivative = error - lastError;
@@ -138,7 +138,7 @@ void turn_PID(float target, int dir)
   }
   else
   {
-    while(error>0){
+    while(error>5){
     curPosition = (RB.rotation(rotationUnits::deg) + RF.rotation(rotationUnits::deg))/2 - (LF.rotation(rotationUnits::deg)+LB.rotation(rotationUnits::deg))/2;
     error = target - std::abs(curPosition);
     derivative = error - lastError;
@@ -158,39 +158,44 @@ void turn_PID(float target, int dir)
     vex::task::sleep(10);
   }
   }
+  RB.stop();
+  LB.stop();
+  RF.stop();
+  LF.stop();
 }
 
 
 void autonomous(void)
 {
-  //drive_PID(1000,1);
-  //turn_PID(899.5,2);
-
-  while(DistanceSensor.objectDistance(mm)>300)
-  {
-    RB.spin(reverse);
-    RF.spin(reverse);
-    LB.spin(reverse);
-    LF.spin(reverse);
-  }
-      RB.stop();
-      RF.stop();
-      LB.stop();
-      LF.stop();
-  
+  drive_PID(1000,1);
+  task::sleep(10);
+  turn_PID(899.5,2);
+  task::sleep(10);
+  // while(DistanceSensor.objectDistance(mm)>300)
+  // {
+  //   RB.spin(reverse);
+  //   RF.spin(reverse);
+  //   LB.spin(reverse);
+  //   LF.spin(reverse);
+  // }
+  //     RB.stop();
+  //     RF.stop();
+  //     LB.stop();
+  //     LF.stop();
+  drive_PID(1000,1);
   turn_PID(1799,2);
 
-   while(DistanceSensor.objectDistance(mm)>300)
-  {
-    RB.spin(reverse);
-    RF.spin(reverse);
-    LB.spin(reverse);
-    LF.spin(reverse);
-  }
-      RB.stop();
-      RF.stop();
-      LB.stop();
-      LF.stop();
+  //  while(DistanceSensor.objectDistance(mm)>300)
+  // {
+  //   RB.spin(reverse);
+  //   RF.spin(reverse);
+  //   LB.spin(reverse);
+  //   LF.spin(reverse);
+  // }
+  //     RB.stop();
+  //     RF.stop();
+  //     LB.stop();
+  //     LF.stop();
 }
 
 //driving 
